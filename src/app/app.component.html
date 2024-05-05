@@ -1,16 +1,11 @@
 <section class="app-container">
-    <header class="container">
-        <h1 class="logo">Bitcoin</h1>
-        <div class="links">
-            <h1 (click)="toPage('home')">Home</h1>
-            <h1 (click)="toPage('contacts')">Contacts</h1>
-            <h1 (click)="toPage('stats')">Statistic</h1>
-        </div>
-    </header>
+    <app-header></app-header>
+
     <main class="container"  >
-        <home-page *ngIf="currPage === 'home'"></home-page>
+        <!-- <home-page *ngIf="currPage === 'home'"></home-page>
         <contact-page *ngIf="currPage === 'contacts'"></contact-page>
-        <statistic-page *ngIf="currPage === 'stats'"></statistic-page>
+        <statistic-page *ngIf="currPage === 'stats'"></statistic-page> -->
+        <router-outlet></router-outlet>
     </main>
     <footer class="container">BitcoinRights &copy;</footer>
 </section>

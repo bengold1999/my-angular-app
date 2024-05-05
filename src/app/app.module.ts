@@ -14,7 +14,8 @@ import { FormsModule } from '@angular/forms'
 import { StatisticPageComponent } from './pages/statistic-page/statistic-page.component'
 import { ChartComponent } from './cmps/chart/chart.component'
 import { NgxChartsModule } from '@swimlane/ngx-charts'
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { AppHeaderComponent } from './cmps/app-header/app-header.component'
 
 @NgModule({
     declarations: [
@@ -27,6 +28,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
         ContactDetailsComponent,
         StatisticPageComponent,
         ChartComponent,
+        AppHeaderComponent,
     ],
     imports: [BrowserModule, AppRoutingModule, HttpClientModule, FormsModule, BrowserAnimationsModule, NgxChartsModule],
     providers: [],
