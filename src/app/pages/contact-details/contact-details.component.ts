@@ -1,5 +1,6 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { Observable, firstValueFrom } from 'rxjs';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, inject } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Observable, firstValueFrom, map, switchMap } from 'rxjs';
 import { Contact } from 'src/app/models/contact.model';
 import { ContactService } from 'src/app/services/contact.service';
 
@@ -10,15 +11,39 @@ import { ContactService } from 'src/app/services/contact.service';
 })
 export class ContactDetailsComponent implements OnInit {
 
-    @Input() contactId: string
-    @Output() onBack = new EventEmitter()
-    contact: Contact
-    contact$: Observable<Contact>
+    @Input() contactId!: string
+    // @Output() Back = new EventEmitter()
+    
+    contact$: Observable<Contact> = this.route.data.pipe(map(data => data['contact']))
 
-    constructor(private contactService: ContactService) { }
+    constructor(
+        private contactService: ContactService,
+        private router: Router,
+        private route: ActivatedRoute
+    ) { }
 
-    async ngOnInit(): Promise<void> {
-        this.contact$ = this.contactService.getContactById(this.contactId)
+    // contact: Contact
+
+    // constructor(private contactService: ContactService) { }
+
+
+    ngOnInit(): void {
+            this.contact$ = this.route.params.pipe(
+            switchMap(params => this.contactService.getContactById(params['id']))
+            )
+        
+
     }
+
+    onBack() {
+        this.router.navigateByUrl('/contacts')
+    }
+
+    ngOnDestroy(): void {
+    }
+
+    // async ngOnInit(): Promise<void> {
+    //     this.contact$ = this.contactService.getContactById(this.contactId)
+    // }
 
 }

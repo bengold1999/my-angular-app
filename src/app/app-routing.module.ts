@@ -4,12 +4,14 @@ import { HomePageComponent } from './pages/home-page/home-page.component';
 import { ContactPageComponent } from './pages/contact-page/contact-page.component';
 import { ContactDetailsComponent } from './pages/contact-details/contact-details.component';
 import { StatisticPageComponent } from './pages/statistic-page/statistic-page.component';
+import { ContactEditComponent } from './pages/contact-edit/contact-edit.component';
 
 const routes: Routes = [
   { path: 'home', component: HomePageComponent },
   {
     path: 'contacts', component: ContactPageComponent, children: [
-
+      { path: 'edit', component: ContactEditComponent },
+      { path: 'edit/:id', component:  ContactEditComponent,}
     ]
   },
 

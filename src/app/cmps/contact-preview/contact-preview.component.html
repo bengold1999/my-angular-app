@@ -1,7 +1,11 @@
-<section (click)="onSelectContact()" class="pet-preview">
-  <img src="https://robohash.org/{{ contact._id }}?set=set1" alt="contact" />
+<section class="contact-preview">
+  <img src="https://robohash.org/{{ contact._id }}?set=set1" (click)="onSelectContact()" alt="contact" />
   <section class="info">
     <p>Name: {{ contact.name }}</p>
     <p>Phone: {{ contact.phone }}</p>
   </section>
+  <section class="actions">
+    <!-- <button (click)="onRemovePet()" class="remove-btn">X</button> -->
+  </section>
+  <a [routerLink]="['/contacts', 'edit',contact._id]">Edit</a>
 </section>
