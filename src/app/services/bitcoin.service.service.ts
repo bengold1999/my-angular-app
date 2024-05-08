@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { interval, map, of, switchMap, timer } from 'rxjs';
-import { storageService } from './storage.service';
+import { utilService } from './storage.service';
 
 @Injectable({
     providedIn: 'root'
@@ -12,12 +12,18 @@ export class BitcoinService {
 
     constructor(private http: HttpClient) { }
 
+
+    getRateStream(coins: number) {
+        return timer(0, 1000 * 60)
+            .pipe(switchMap(() => this.getRate(coins)))
+    }
+
     getRate(coins: number) {
         return this.http.get<string>(`https://blockchain.info/tobtc?currency=USD&value=${coins}`)
     }
 
     getTradeVolume() {
-        const data = storageService.load(this.TRADE_VOLUME_KEY)
+        const data = utilService.load(this.TRADE_VOLUME_KEY)
         // console.log('data service', data);
 
         if (data) return of(data)
@@ -25,7 +31,7 @@ export class BitcoinService {
             .pipe(map(res => {
                 //prepare the data in a way that the chart can render
                 const vals = res.values.map(item => { return { name: new Date(item.x * 1000).toLocaleDateString("en-US"), value: item.y } })
-                storageService.store(this.TRADE_VOLUME_KEY, vals)
+                utilService.store(this.TRADE_VOLUME_KEY, vals)
                 return vals
             }))
     }

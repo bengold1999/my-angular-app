@@ -17,13 +17,12 @@ export class ContactFilterComponent implements OnInit {
 
     ngOnInit(): void {
         this.subscription = this.contactService.contactFilter$.subscribe(contactFilter => {
-            console.log('contactFilter cmp:', contactFilter)
             this.contactFilter = contactFilter
         })
     }
 
     onSetFilter() {
-        this.contactService.setContactFilter({ ...this.contactFilter })
+        this.contactService.setFilter({ ...this.contactFilter })
     }
 
 }

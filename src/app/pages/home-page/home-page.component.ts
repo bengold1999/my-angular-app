@@ -1,23 +1,33 @@
-import { Component, OnInit } from '@angular/core'
-import { Observable } from 'rxjs'
-import { User } from 'src/app/models/user.model'
-import { BitcoinService } from 'src/app/services/bitcoin.service.service'
-import { UserService } from 'src/app/services/user.service'
+import { Component, OnInit } from '@angular/core';
+import { Observable, filter, map, switchMap } from 'rxjs';
+import { Move } from 'src/app/models/move.model';
+import { User } from 'src/app/models/user.model';
+import { BitcoinService } from 'src/app/services/bitcoin.service.service';
+import { UserService } from 'src/app/services/user.service';
 
 @Component({
     selector: 'home-page',
     templateUrl: './home-page.component.html',
-    styleUrls: ['./home-page.component.scss'],
+    styleUrls: ['./home-page.component.scss']
 })
-export class HomePageComponent implements OnInit {
-    user: User
-    BTC$: Observable<string>
+export class HomePageComponent {
 
-    constructor(private userService: UserService, private bitcoinService: BitcoinService) { }
+    user$: Observable<User> = this.userService.loggedInUser$
+    
+    BTC$: Observable<string> = this.user$.pipe(
+        filter(user => !!user),
+        switchMap(user => this.bitcoinService.getRateStream(user.coins))
+    )
+    userMoves$: Observable<Move[]> = this.user$.pipe(
+        filter(user => !!user),
+        map(user => user.moves.slice(0, 3))
+    )
 
-    ngOnInit(): void {
-        this.user = this.userService.getUser()
-        this.BTC$ = this.bitcoinService.getRate(this.user.coins)
-    }
+
+
+    constructor(
+        private userService: UserService,
+        private bitcoinService: BitcoinService
+    ) { }
+
 }
-

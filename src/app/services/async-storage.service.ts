@@ -1,5 +1,3 @@
-import { Contact } from "../models/contact.model"
-
 export const storageService = {
     query,
     get,
@@ -9,9 +7,11 @@ export const storageService = {
     makeId
 }
 
-type Entity = Contact
+type EntityId = {
+    _id: string
+}
 
-async function query(entityType: string, delay = 10): Promise<Entity[]> {
+async function query<T>(entityType: string, delay = 100): Promise<T[]> {
     var entities = JSON.parse(localStorage.getItem(entityType) || 'null') || []
     if (delay) {
         return new Promise((resolve) => setTimeout(resolve, delay, entities))
@@ -19,39 +19,39 @@ async function query(entityType: string, delay = 10): Promise<Entity[]> {
     return entities
 }
 
-async function get(entityType: string, entityId: string): Promise<Entity> {
-    const entities = await query(entityType)
+async function get<T extends EntityId>(entityType: string, entityId: string): Promise<T> {
+    const entities = await query<T>(entityType)
     const entity = entities.find(entity => entity._id === entityId)
     if (!entity) throw new Error(`Cannot get, Item ${entityId} of type: ${entityType} does not exist`)
     return entity;
 }
 
-async function post(entityType: string, newEntity: Entity): Promise<Entity> {
-    const entities = await query(entityType)
+async function post<T>(entityType: string, newEntity: T): Promise<T> {
+    newEntity = { ...newEntity, _id: makeId() }
+    const entities = await query<T>(entityType)
     entities.push(newEntity)
     _save(entityType, entities)
     return newEntity
 }
 
-async function put(entityType: string, updatedEntity: Entity): Promise<Entity> {
-    const entities = await query(entityType)
+async function put<T extends EntityId>(entityType: string, updatedEntity: T): Promise<T> {
+    const entities = await query<T>(entityType)
     const idx = entities.findIndex(entity => entity._id === updatedEntity._id)
     entities[idx] = updatedEntity
     _save(entityType, entities)
     return updatedEntity
 }
 
-async function remove(entityType: string, entityId: string): Promise<string> {
-    const entities = await query(entityType)
+async function remove<T extends EntityId>(entityType: string, entityId: string): Promise<void> {
+    const entities = await query<T>(entityType)
     const idx = entities.findIndex(entity => entity._id === entityId)
     if (idx !== -1) entities.splice(idx, 1)
     else throw new Error(`Cannot remove, item ${entityId} of type: ${entityType} does not exist`)
     _save(entityType, entities)
-    return entityId;
 }
 
 
-function _save(entityType: string, entities: Entity[]) {
+function _save<T>(entityType: string, entities: T[]) {
     localStorage.setItem(entityType, JSON.stringify(entities))
 }
 

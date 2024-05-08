@@ -10,8 +10,6 @@ export class AppComponent implements OnInit {
 
     constructor(private contactService: ContactService) { }
     title = 'mister-bitcoin-try';
-    currPage: string = 'home'
-
     ngOnInit(): void {
         this.contactService.loadContacts().subscribe({
             error: err => {
@@ -20,7 +18,4 @@ export class AppComponent implements OnInit {
         })
     }
 
-    toPage(pageName: string) {
-        this.currPage = pageName;
-    }
 }

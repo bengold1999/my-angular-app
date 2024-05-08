@@ -1,20 +1,27 @@
-import { Component, OnInit } from '@angular/core'
-import { Observable } from 'rxjs'
-import { Contact } from 'src/app/models/contact.model'
-import { ContactService } from 'src/app/services/contact.service'
+import { Component, OnInit } from '@angular/core';
+import { Observable } from 'rxjs';
+import { Contact } from 'src/app/models/contact.model';
+import { ContactService } from 'src/app/services/contact.service';
+import { MsgService } from 'src/app/services/msg.service';
 
 @Component({
     selector: 'contact-page',
     templateUrl: './contact-page.component.html',
-    styleUrls: ['./contact-page.component.scss'],
+    styleUrls: ['./contact-page.component.scss']
 })
-export class ContactPageComponent implements OnInit {
-    contacts$: Observable<Contact[]>
-    selectedContactId: string
+export class ContactPageComponent {
 
-    constructor(private contactService: ContactService) { }
 
-    ngOnInit(): void {
-        this.contacts$ = this.contactService.contacts$
+    contacts$: Observable<Contact[]> = this.contactService.contacts$
+
+    constructor(private contactService: ContactService, private msgService: MsgService) { }
+
+
+
+    onRemoveContact(contactId: string) {
+        this.contactService.removeContact(contactId).subscribe({
+            error: err => this.msgService.setErrorMsg(err.message)
+        })
     }
+
 }

@@ -1,38 +1,46 @@
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, inject } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { Observable, firstValueFrom, map, switchMap } from 'rxjs';
-import { Contact } from 'src/app/models/contact.model';
-import { ContactService } from 'src/app/services/contact.service';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core'
+import { ActivatedRoute, Router } from '@angular/router'
+import { Observable, Subscription, combineLatest, filter, map, of, take, tap } from 'rxjs'
+import { Contact } from 'src/app/models/contact.model'
+import { MsgService } from 'src/app/services/msg.service'
+import { UserService } from 'src/app/services/user.service'
 
 @Component({
     selector: 'contact-details',
     templateUrl: './contact-details.component.html',
-    styleUrls: ['./contact-details.component.scss']
+    styleUrls: ['./contact-details.component.scss'],
 })
-export class ContactDetailsComponent implements OnInit {
-
-    @Input() contactId!: string
-    // @Output() Back = new EventEmitter()
-    
-    contact$: Observable<Contact> = this.route.data.pipe(map(data => data['contact']))
-
+export class ContactDetailsComponent implements OnInit, OnDestroy {
     constructor(
-        private contactService: ContactService,
-        private router: Router,
-        private route: ActivatedRoute
-    ) { }
+        private userService: UserService,
+        private route: ActivatedRoute,
+        private msgService: MsgService,
+        private router: Router) {
+    }
 
-    // contact: Contact
+    subscription!: Subscription
+    contact: Contact | null = null
 
-    // constructor(private contactService: ContactService) { }
-
+    contact$ = this.route.data.pipe(map(data => data['contact']))
+    user$ = this.userService.loggedInUser$
+    contactMoves$ = combineLatest([this.user$, this.contact$]).pipe(
+        filter(([user]) => !!user),
+        map(([user, contact]) => user?.moves.filter(move => move.toId === contact._id))
+    )
 
     ngOnInit(): void {
-            this.contact$ = this.route.params.pipe(
-            switchMap(params => this.contactService.getContactById(params['id']))
-            )
-        
+        this.subscription = this.contact$.subscribe(contact => this.contact = contact)
+    }
 
+    onTransferCoins(amount: number) {
+        this.userService.addMove(this.contact, amount)
+            .pipe(take(1))
+            .subscribe({
+                next: () => {
+                    this.msgService.setSuccessMsg(`Transferred ${amount} coins to ${this.contact?.name}`)
+                },
+                error: (err) => console.log(err)
+            })
     }
 
     onBack() {
@@ -40,10 +48,8 @@ export class ContactDetailsComponent implements OnInit {
     }
 
     ngOnDestroy(): void {
+        this.subscription.unsubscribe()
     }
 
-    // async ngOnInit(): Promise<void> {
-    //     this.contact$ = this.contactService.getContactById(this.contactId)
-    // }
-
+    
 }

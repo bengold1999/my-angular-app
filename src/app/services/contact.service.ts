@@ -28,13 +28,13 @@ export class ContactService {
     }
 
 
-    public setContactFilter(contactFilter: ContactFilter) {
+    public setFilter(contactFilter: ContactFilter) {
         this._contactFilter$.next(contactFilter)
         this.loadContacts().subscribe()
     }
 
     public loadContacts() {
-        return from(storageService.query(ENTITY))
+        return from(storageService.query<Contact>(ENTITY))
             .pipe(
                 tap(contacts => {
                     const contactFilter = this._contactFilter$.value
@@ -49,11 +49,12 @@ export class ContactService {
     }
 
     public getContactById(id: string): Observable<Contact> {
-        return from(storageService.get(ENTITY, id))
+        return from(storageService.get<Contact>(ENTITY, id))
             .pipe(catchError(this._handleError))
     }
 
-    public deleteContact(id: string) {
+    public removeContact(id: string) {
+        // return throwError(() => new Error('Cant Remove Contact!'))
         return from(storageService.remove(ENTITY, id))
             .pipe(
                 tap(() => {
@@ -67,10 +68,11 @@ export class ContactService {
     }
 
     public saveContact(contact: Contact) {
+        console.log('contact:', contact)
         return contact._id ? this._updateContact(contact) : this._addContact(contact)
     }
 
-    public getEmptyContact() {
+    public getEmptyContact(): Partial<Contact> {
         return {
             name: '',
             email: '',
@@ -80,8 +82,7 @@ export class ContactService {
 
 
     private _updateContact(contact: Contact) {
-
-        return from(storageService.post(ENTITY, contact))
+        return from(storageService.put(ENTITY, contact))
             .pipe(
                 tap(updatedContact => {
                     const contacts = this._contacts$.value
@@ -93,13 +94,12 @@ export class ContactService {
     }
 
     private _addContact(contact: Contact) {
-        const newContact = new Contact(contact.name, contact.email, contact.phone);
-        if (typeof newContact.setId === 'function') newContact.setId(this._getRandomId());
-        return from(storageService.post(ENTITY, contact))
+        const newContact = this._createContact(contact.name, contact.email, contact.phone);
+        return from(storageService.post(ENTITY, newContact))
             .pipe(
                 tap(newContact => {
                     const contacts = this._contacts$.value
-                    this._contacts$.next([...contacts, newContact])
+                    this._contacts$.next([...contacts, newContact as Contact])
                 }),
                 retry(1),
                 catchError(this._handleError)
@@ -246,6 +246,14 @@ export class ContactService {
             }
         ];
         return contacts
+    }
+
+    private _createContact(name: string, email: string, phone: string): Partial<Contact> {
+        return {
+            name,
+            email,
+            phone,
+        }
     }
 
     private _handleError(err: HttpErrorResponse) {

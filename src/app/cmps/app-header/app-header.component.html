@@ -1,8 +1,17 @@
 <header class="container">
-    <h1 class="logo">Pets</h1>
-    <nav class="links">
-        <a routerLink="/home" routerLinkActive="active">Home</a>
-        <a routerLink="/contacts" routerLinkActive="active">Contacts</a>
-        <a routerLink="/stas" routerLinkActive="active">Statistic</a>
-    </nav>
+	<h1 class="logo">Bitcoin</h1>
+	<div class="links">
+		<a
+			routerLink="/"
+			routerLinkActive="active"
+			[routerLinkActiveOptions]="{ exact: true }"
+			>Home</a
+		>
+		<a routerLink="contacts" routerLinkActive="active">Contacts</a>
+		<a routerLink="statistic" routerLinkActive="active">Statistic</a>
+	</div>
+	<section class="auth" *ngIf="loggedInUser$ | async as user">
+		<h3>Hello {{ user.name | titlecase }}!</h3>
+		<button class="capitalize button" (click)="onLogout()">Logout</button>
+	</section>
 </header>

@@ -1,6 +1,11 @@
-<section class="home-page">
-    <h1>Hello {{ user.name }}!</h1>
-    <h3>Coins: {{ user.coins }}</h3>
-    <h3>BTC: {{ BTC$ | async }}</h3>
-    <pre>{{ user | json }}</pre>
+<section *ngIf="user$ | async as user" class="home-page">
+	<h1>Hello {{ user.name | titlecase }}!</h1>
+	<h3>Coins: {{ user.coins }}</h3>
+	<h3>BTC: {{ BTC$ | async }}</h3>
+	<move-list
+		*ngIf="userMoves$ | async as userMoves"
+		[contact]="null"
+		[moves]="userMoves"
+	></move-list>
+	<p *ngIf="!user.moves.length">No transactions yet...</p>
 </section>
