@@ -2,9 +2,11 @@ header {
     height: 70px;
     display: flex;
     align-items: center;
-    background-color: #4caf;
-    //   margin-bottom: 30px;
     justify-content: space-between;
+    border-bottom: 1px solid rgba(128, 128, 128, 0.39);
+    box-shadow: 1px 1px rgba(255, 255, 255, 0.281);
+    background: rgba(128, 128, 128, 0.484);
+
     .links {
         cursor: pointer;
         display: flex;
